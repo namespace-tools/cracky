@@ -25,7 +25,7 @@ with open(argv[2]) as infile:
 with open(argv[3]) as wordlist:
 	for Line in wordlist:
 		x = str.strip(Line)
-		if globals()[HashType](bytes(''.join(x),'utf8')).hexdigest() == hash:
+		if globals()[HashType](bytes(''.join(x),'latin-1')).hexdigest() == hash:
 				print(f">> Password: {''.join(x)}\n")
 				exit()
 
