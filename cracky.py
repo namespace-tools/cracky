@@ -19,7 +19,7 @@ print(
         \/            \/     \/     \/\/                 \/     
 \x1b[36m————————————————————————————————————————————————————————————————\033[0m""")
 
-with open(argv[2]) as infile:
+with open(argv[2], encoding='latin-1') as infile:
 	hash = str.strip(infile.readline())
 
 with open(argv[3]) as wordlist:
