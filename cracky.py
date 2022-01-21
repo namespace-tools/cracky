@@ -4,10 +4,10 @@
 #
 # USAGE: cracky.py [HashType] [HashFile] [WordList]
 
-from hashlib import *
 from sys import argv
-
-HashType = argv[1]
+from hashlib import *
+from crypt import crypt
+from hmac import compare_digest
 
 print(
 """\x1b[36m————————————————————————————————————————————————————————————————
@@ -19,13 +19,35 @@ print(
         \/            \/     \/     \/\/                 \/
 \x1b[36m————————————————————————————————————————————————————————————————\033[0m""")
 
+# Print the help/system info
+if argv[1] == '-l' or argv[1] == '-h':
+	print("\tUSAGE: cracky.py [HashType] [HashFile] [WordList]\n")
+	print("Available on this system:")
+	print("> unix")
+	for i in range(0, len(algorithms_available)):
+		print("> "+list(algorithms_available)[i])
+	exit()
+
+# Load the hash, only one for now
 with open(argv[2]) as infile:
 	hash = str.strip(infile.readline())
 
-with open(argv[3], encoding='latin-1') as wordlist:
-	for Line in wordlist:
-		if globals()[HashType](bytes(Line.strip(), 'latin-1')).hexdigest() == hash:
-				print(f">> Password: {Line}\n")
-				exit()
+def crack():
+# Cracking basic hashes from the hashlib module
+	if argv[1].lower() in algorithms_available:
+		with open(argv[3], encoding='latin-1') as wordlist:
+			for Line in wordlist:
+				if globals()[argv[1].lower()](bytes(Line.strip(), 'latin-1')).hexdigest() == hash:
+					print(f">> Password: {Line}\n")
+					exit()
+# Cracking standard UNIX $6 passwords
+	elif argv[1].lower() in "unix":
+		with open(argv[3], encoding='latin-1') as wordlist:
+			for Line in wordlist:
+				if compare_digest(crypt(Line.strip(), hash), hash):
+					print(f">> Password: {Line}\n")
+					exit()
+# Fail notice
+	print(f" Unable to crack: {hash}")
 
-print(f" Unable to crack: {hash}")
+crack()
